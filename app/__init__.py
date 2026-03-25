@@ -51,7 +51,7 @@ def create_app():
     
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(jobs_bp, url_prefix="/jobs")
+    app.register_blueprint(jobs_bp)  # No prefix - landing page is at root /
     app.register_blueprint(profile_bp, url_prefix="/profile")
     app.register_blueprint(apps_bp, url_prefix="/applications")
     app.register_blueprint(recs_bp, url_prefix="/recommendations")
