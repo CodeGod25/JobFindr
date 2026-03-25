@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}JobFindr | Jobs Feed{% endblock %}
+
+{% block content %}
+<div class="max-w-[1440px] mx-auto pt-24 pb-24 px-4 md:px-6 grid grid-cols-1 md:grid-cols-12 gap-8">
+
+  <!-- Left Sidebar -->
+  <aside class="hidden md:block md:col-span-3 lg:col-span-2 space-y-6">
+    <div class="glass-panel rounded-DEFAULT p-6 border border-white/5 sticky top-24">
+      <div class="flex flex-col items-center text-center mb-6">
+        <div class="w-20 h-20 rounded-full border-4 border-surface mb-4 bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-3xl font-black overflow-hidden">
+          {% if user.avatar %}
+            <img src="{{ user.avatar }}" alt="{{ user.name }}" class="w-full h-full object-cover"/>
+          {% else %}
+            {{ user.name[0] }}
+          {% endif %}
+        </div>
+        <h2 class="text-xl font-bold tracking-tight">{{ user.name }}</h2>
+        <p class="text-on-surface-variant text-sm">{{ user.title }}</p>
+        <p class="text-xs text-slate-500 mt-1">{{ user.location }}</p>
+      </div>
+      <nav class="space-y-1">
+        <a href="{{ url_for('jobs.feed') }}" class="{% if active_filter == 'for_you' %}bg-emerald-500/10 text-emerald-400{% else %}text-slate-400 hover:text-emerald-300{% endif %} rounded-r-full font-bold px-4 py-3 flex items-center gap-3 transition-transform hover:translate-x-1">
+          <span class="material-symbols-outlined">dynamic_feed</span> Feed
+        </a>
+        <a href="{{ url_for('recommendations.recommendations') }}" class="text-slate-400 hover:text-emerald-300 px-4 py-3 flex items-center gap-3 transition-transform hover:translate-x-1">
+          <span class="material-symbols-outlined">psychology</span> AI Matches
+        </a>
+        <a href="{{ url_for('applications.applications') }}" class="text-slate-400 hover:text-emerald-300 px-4 py-3 flex items-center gap-3 transition-transform hover:translate-x-1">
+          <span class="material-symbols-outlined">work</span> Applications
+        </a>
+        <a href="{{ url_for('jobs.dashboard') }}" class="text-slate-400 hover:text-emerald-300 px-4 py-3 flex items-center gap-3 transition-transform hover:translate-x-1">
+          <span class="material-symbols-outlined">monitoring</span> Dashboard
+        </a>
+        <a href="{{ url_for('profile.profile') }}" class="text-slate-400 hover:text-emerald-300 px-4 py-3 flex items-center gap-3 transition-transform hover:translate-x-1">
+          <span class="material-symbols-outlined">person</span> Profile
+        </a>
+      </nav>
+      <div class="mt-8 pt-6 border-t border-white/5">
+        <a href="{{ url_for('recruiter.recruiter_portal') }}" class="block w-full py-3 bg-gradient-to-r from-primary-fixed to-primary-fixed-dim text-on-primary-fixed font-bold rounded-DEFAULT shadow-lg shadow-emerald-500/20 text-center hover:scale-[1.02] transition-transform">
+          Post a Job
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Feed -->
+  <main class="md:col-span-9 lg:col-span-7 space-y-6">
+    <!-- Search Bar -->
+    <form method="GET" action="{{ url_for('jobs.feed') }}" class="flex gap-3">
+      <div class="flex-1 flex items-center glass-panel border border-white/5 rounded-xl px-4 gap-3 hover:border-emerald-400/20 transition-all">
+        <span class="material-symbols-outlined text-slate-500">search</span>
+        <input
+          name="q"
+          type="text"
+          value="{{ search_q }}"
+          placeholder="Search jobs… e.g. machine learning, NLP, cloud"
+          class="flex-1 bg-transparent py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none"
+        />
+        {% if search_q %}
+        <a href="{{ url_for('jobs.feed') }}" class="text-slate-500 hover:text-red-400 transition-colors">
+          <span class="material-symbols-outlined text-sm">close</span>
+        </a>
+        {% endif %}
+      </div>
+      <button type="submit" class="px-5 py-3 gradient-cta text-on-primary-fixed font-bold rounded-xl text-sm hover:scale-[1.02] transition-all">
+        Search
+      </button>
+    </form>
+
+    <!-- Filter Tabs -->
+    <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <a href="{{ url_for('jobs.feed', filter='for_you') }}" class="px-5 py-2 glass-panel rounded-full border {% if active_filter == 'for_you' and not search_q %}border-primary-fixed-dim/30 text-primary-fixed-dim{% else %}border-white/5 text-on-surface-variant hover:bg-white/5{% endif %} text-sm font-medium whitespace-nowrap">
+        ✦ For You
+      </a>
+      <a href="{{ url_for('jobs.feed', filter='remote') }}" class="px-5 py-2 glass-panel rounded-full border {% if active_filter == 'remote' %}border-primary-fixed-dim/30 text-primary-fixed-dim{% else %}border-white/5 text-on-surface-variant hover:bg-white/5{% endif %} text-sm font-medium whitespace-nowrap">
+        Remote Only
+      </a>
+      <a href="{{ url_for('jobs.feed', filter='senior') }}" class="px-5 py-2 glass-panel rounded-full border {% if active_filter == 'senior' %}border-primary-fixed-dim/30 text-primary-fixed-dim{% else %}border-white/5 text-on-surface-variant hover:bg-white/5{% endif %} text-sm font-medium whitespace-nowrap">
+        Senior Roles
+      </a>
+    </div>
+
+    <!-- Job Count / Search Badge -->
+    <div class="flex items-center justify-between">
+      {% if search_q %}
+      <p class="text-sm text-slate-500">
+        <span class="text-emerald-400 font-bold">{{ jobs|length }}</span> results for
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-500/10 border border-emerald-400/20 rounded-full text-emerald-400 text-xs font-semibold ml-1">
+          <span class="material-symbols-outlined text-xs">search</span>
+          {{ search_q }}
+        </span>
+      </p>
+      {% else %}
+      <p class="text-sm text-slate-500">Showing <span class="text-emerald-400 font-bold">{{ jobs|length }}</span> AI-matched roles</p>
+      {% endif %}
+      <span class="text-xs text-slate-600 flex items-center gap-1"><span class="material-symbols-outlined text-xs">psychology</span> Ranked by Neural Match Score</span>
+    </div>
+
+    <!-- Job Cards -->
+    <div class="space-y-6">
+      {% for job in jobs %}
+      <article class="glass-panel {% if loop.first %}ai-glow{% endif %} rounded-DEFAULT border {% if loop.first %}border-emerald-400/20{% else %}border-white/10{% endif %} p-6 flex flex-col gap-5 group hover:border-emerald-400/30 transition-all duration-300">
+        <div class="flex justify-between items-start gap-4">
+          <div class="flex gap-4 flex-1 min-w-0">
+            <div class="w-14 h-14 rounded-DEFAULT bg-surface-container-high flex items-center justify-center flex-shrink-0 overflow-hidden border border-white/10">
+              <span class="text-2xl font-black text-emerald-400">{{ job.company[0] }}</span>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-lg md:text-xl font-bold text-primary group-hover:text-primary-fixed-dim transition-colors truncate">{{ job.title }}</h3>
+              <p class="text-on-surface-variant font-medium text-sm">{{ job.company }} · {{ job.location }}</p>
+              <div class="flex gap-2 mt-2 flex-wrap">
+                <span class="px-2 py-0.5 text-xs rounded-full bg-surface-container-highest text-slate-400">{{ job.type }}</span>
+                {% for skill in job.skills[:3] %}
+                <span class="px-2 py-0.5 text-xs rounded-full bg-emerald-500/10 text-emerald-400">{{ skill }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          <!-- Match Score Ring -->
+          <div class="relative w-16 h-16 flex items-center justify-center flex-shrink-0">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
+              <circle class="text-surface-container-highest" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+              <circle class="text-primary-fixed-dim" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor"
+                stroke-dasharray="175.9" stroke-dashoffset="{{ job.svg_offset | default(70) }}" stroke-width="4" stroke-linecap="round"></circle>
+            </svg>
+            <span class="absolute text-xs font-black text-primary-fixed-dim">{{ job.match_score }}%</span>
+          </div>
+        </div>
+
+        {% if job.match_reason %}
+        <div class="bg-surface-container-low/50 rounded-DEFAULT p-4 border border-emerald-400/10">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-primary-fixed-dim text-sm">auto_awesome</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-primary-fixed-dim">Neural Match Reason</span>
+          </div>
+          <p class="text-sm text-on-surface-variant leading-relaxed">{{ job.match_reason | safe }}</p>
+        </div>
+        {% endif %}
+
+        <div class="flex flex-wrap justify-between items-center gap-4">
+          <div class="flex items-center gap-6">
+            <div class="flex flex-col">
+              <span class="text-[10px] uppercase tracking-tighter text-on-surface-variant/60 font-bold">Salary</span>
+              <span class="text-lg font-bold text-primary">{{ job.salary_display }}</span>
+            </div>
+            <div class="h-8 w-px bg-white/10"></div>
+            <div class="flex flex-col">
+              <span class="text-[10px] uppercase tracking-tighter text-on-surface-variant/60 font-bold">Posted</span>
+              <span class="text-sm font-medium text-on-surface-variant">{{ job.posted_at }}</span>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button class="p-3 glass-panel border border-white/5 rounded-DEFAULT text-on-surface-variant hover:text-error hover:border-error/30 transition-all" title="Not interested">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+            <button class="p-3 glass-panel border border-white/5 rounded-DEFAULT text-on-surface-variant hover:text-primary-fixed-dim hover:border-primary-fixed-dim/30 transition-all" title="Save job">
+              <span class="material-symbols-outlined">bookmark</span>
+            </button>
+            <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" class="px-6 py-3 bg-gradient-to-br from-primary-fixed to-primary-fixed-dim text-on-primary-fixed font-bold rounded-DEFAULT shadow-xl shadow-emerald-500/10 hover:shadow-emerald-500/30 transition-all active:scale-95">
+              View Job
+            </a>
+          </div>
+        </div>
+      </article>
+      {% else %}
+      <div class="text-center py-20 text-slate-500">
+        <span class="material-symbols-outlined text-5xl mb-4 block">search_off</span>
+        <p class="text-lg font-semibold">No jobs found for this filter</p>
+        <a href="{{ url_for('jobs.feed') }}" class="mt-4 inline-block text-emerald-400 hover:underline">View all recommendations</a>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+
+  <!-- Right Sidebar -->
+  <aside class="hidden lg:block lg:col-span-3 space-y-6">
+    <!-- Trending -->
+    <div class="glass-panel rounded-DEFAULT p-6 border border-white/5">
+      <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary-fixed-dim">trending_up</span>
+        Trending Careers
+      </h3>
+      <div class="space-y-4">
+        <div class="p-3 hover:bg-white/5 rounded-lg transition-all cursor-pointer">
+          <p class="text-xs font-bold text-primary-fixed-dim uppercase tracking-wider mb-1">AI Research</p>
+          <h4 class="text-sm font-semibold mb-1">Large Language Model Engineer</h4>
+          <p class="text-xs text-on-surface-variant">1,240 new openings this week</p>
+        </div>
+        <div class="p-3 hover:bg-white/5 rounded-lg transition-all cursor-pointer">
+          <p class="text-xs font-bold text-primary-fixed-dim uppercase tracking-wider mb-1">MLOps</p>
+          <h4 class="text-sm font-semibold mb-1">ML Platform Engineer</h4>
+          <p class="text-xs text-on-surface-variant">850 new openings this week</p>
+        </div>
+        <div class="p-3 hover:bg-white/5 rounded-lg transition-all cursor-pointer">
+          <p class="text-xs font-bold text-primary-fixed-dim uppercase tracking-wider mb-1">Data</p>
+          <h4 class="text-sm font-semibold mb-1">Real-Time Analytics Engineer</h4>
+          <p class="text-xs text-on-surface-variant">620 new openings this week</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill Benchmarks -->
+    <div class="glass-panel rounded-DEFAULT p-6 border border-white/5">
+      <h3 class="text-lg font-bold mb-4">Your Skill Benchmarks</h3>
+      <div class="space-y-4">
+        {% for skill in user.skills[:5] %}
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-on-surface">{{ skill }}</span>
+            <span class="text-primary-fixed-dim">Top {{ [5,8,12,18,25]|random }}%</span>
+          </div>
+          <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-primary-fixed to-primary-fixed-dim rounded-full" style="width: {{ [75,82,88,91,95]|random }}%"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Companies -->
+    <div class="glass-panel rounded-DEFAULT p-6 border border-white/5">
+      <h3 class="text-lg font-bold mb-4">Top Companies Hiring</h3>
+      <div class="space-y-3">
+        {% for company_id, name in [(1, 'Stripe'), (2, 'OpenAI')] %}
+        <a href="{{ url_for('recruiter.company_profile', company_id=company_id) }}" class="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg transition-all group">
+          <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-emerald-400 font-black border border-white/5">{{ name[0] }}</div>
+          <div>
+            <p class="text-sm font-semibold group-hover:text-emerald-400 transition-colors">{{ name }}</p>
+            <p class="text-xs text-slate-500">View open roles</p>
+          </div>
+          <span class="material-symbols-outlined text-slate-600 group-hover:text-emerald-400 transition-colors ml-auto text-sm">arrow_forward</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}JobFindr | Find Your Dream Job with AI Precision{% endblock %}
+
+{% block content %}
+<main class="relative pt-0">
+
+  <!-- Top Nav (Landing-specific, no session nav) -->
+  <nav class="fixed top-0 w-full z-50 bg-[#041329]/60 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+    <div class="max-w-7xl mx-auto flex justify-between items-center px-8 py-4">
+      <div class="text-2xl font-black tracking-tighter text-[#38DEBB]">JobFindr</div>
+      <div class="hidden md:flex items-center space-x-8 font-medium tracking-tight">
+        <a class="text-[#38DEBB] border-b-2 border-[#38DEBB] pb-1" href="#">Explore Jobs</a>
+        <a class="text-slate-400 hover:text-white transition-colors" href="#">AI Matching</a>
+        <a class="text-slate-400 hover:text-white transition-colors" href="#">Companies</a>
+        <a class="text-slate-400 hover:text-white transition-colors" href="#">Resources</a>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="{{ url_for('auth.login') }}" class="text-slate-400 hover:text-white font-medium px-4 py-2 transition-all">Sign In</a>
+        <a href="{{ url_for('auth.register') }}" class="gradient-cta text-on-primary-fixed font-bold px-6 py-2.5 rounded-full shadow-lg shadow-primary-container/20 hover:scale-105 transition-transform">
+          Get Started
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative min-h-[870px] flex flex-col items-center justify-center px-6 overflow-hidden pt-24">
+    <div class="absolute top-1/4 -left-20 w-96 h-96 bg-primary-container/10 rounded-full blur-[120px]"></div>
+    <div class="absolute bottom-1/4 -right-20 w-96 h-96 bg-primary-fixed-dim/5 rounded-full blur-[100px]"></div>
+    <div class="max-w-5xl mx-auto text-center z-10">
+      <span class="inline-block px-4 py-1.5 rounded-full bg-surface-container-highest border border-outline-variant/20 text-primary-fixed-dim text-sm font-semibold tracking-wider uppercase mb-6 animate-pulse">
+        Powered by Neural Matching AI
+      </span>
+      <h1 class="text-6xl md:text-8xl font-black tracking-tighter leading-tight mb-8">
+        Find Your Dream Job with <span class="text-primary-fixed-dim text-glow italic">AI Precision</span>
+      </h1>
+      <p class="text-lg md:text-xl text-on-surface-variant max-w-2xl mx-auto mb-12 leading-relaxed">
+        The world's most advanced job matching engine. We analyse your unique professional DNA to connect you with opportunities that actually matter.
+      </p>
+      <!-- Search Bar -->
+      <div class="glass ai-glow p-2 rounded-2xl flex flex-col md:flex-row gap-2 max-w-4xl mx-auto shadow-2xl">
+        <div class="flex-1 flex items-center px-4 py-3 bg-surface-container-lowest/50 rounded-xl">
+          <span class="material-symbols-outlined text-primary-fixed-dim mr-3">search</span>
+          <input class="bg-transparent border-none focus:ring-0 text-on-surface w-full placeholder:text-slate-500" placeholder="Job title, skills, or company" type="text" id="heroJobSearch"/>
+        </div>
+        <div class="flex-1 flex items-center px-4 py-3 bg-surface-container-lowest/50 rounded-xl">
+          <span class="material-symbols-outlined text-primary-fixed-dim mr-3">location_on</span>
+          <input class="bg-transparent border-none focus:ring-0 text-on-surface w-full placeholder:text-slate-500" placeholder="Location or Remote" type="text" id="heroLocation"/>
+        </div>
+        <a href="{{ url_for('auth.register') }}" class="gradient-cta text-on-primary-fixed font-bold px-8 py-4 rounded-xl hover:scale-105 transition-all text-center">
+          Find Jobs
+        </a>
+      </div>
+    </div>
+    <!-- Stats Bar -->
+    <div class="mt-20 w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
+      <div class="flex flex-col items-center p-6 rounded-2xl bg-surface-container-low/40 border border-outline-variant/10 hover:border-emerald-400/20 transition-colors">
+        <span class="text-4xl font-black text-primary-fixed-dim mb-1">50K+</span>
+        <span class="text-slate-400 font-medium tracking-wide">Jobs Posted Daily</span>
+      </div>
+      <div class="flex flex-col items-center p-6 rounded-2xl bg-surface-container-low/40 border border-outline-variant/10 hover:border-emerald-400/20 transition-colors">
+        <span class="text-4xl font-black text-primary-fixed-dim mb-1">10K+</span>
+        <span class="text-slate-400 font-medium tracking-wide">Top Companies</span>
+      </div>
+      <div class="flex flex-col items-center p-6 rounded-2xl bg-surface-container-low/40 border border-outline-variant/10 hover:border-emerald-400/20 transition-colors">
+        <span class="text-4xl font-black text-primary-fixed-dim mb-1">95%</span>
+        <span class="text-slate-400 font-medium tracking-wide">Match Rate Accuracy</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="py-32 relative px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-20">
+        <h2 class="text-4xl md:text-5xl font-black tracking-tight mb-4">Precision Workflow</h2>
+        <p class="text-slate-400 max-w-xl mx-auto">Three steps to transition from searching to succeeding.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+        <div class="relative z-10 flex flex-col items-center text-center group">
+          <div class="glass ai-glow w-24 h-24 rounded-2xl flex items-center justify-center mb-8 border border-outline-variant/20 group-hover:border-primary-fixed-dim/50 transition-all duration-500">
+            <span class="material-symbols-outlined text-4xl text-primary-fixed-dim">upload_file</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Upload Profile</h3>
+          <p class="text-slate-400">Enter your skills and experience. Our AI parses every achievement and nuance to build your professional fingerprint.</p>
+        </div>
+        <div class="relative z-10 flex flex-col items-center text-center group">
+          <div class="glass ai-glow w-24 h-24 rounded-2xl flex items-center justify-center mb-8 border border-outline-variant/20 group-hover:border-primary-fixed-dim/50 transition-all duration-500">
+            <span class="material-symbols-outlined text-4xl text-primary-fixed-dim">neurology</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Neural Analysis</h3>
+          <p class="text-slate-400">TF-IDF and cosine similarity maps your expertise against thousands of live job listings to find the perfect fit.</p>
+        </div>
+        <div class="relative z-10 flex flex-col items-center text-center group">
+          <div class="glass ai-glow w-24 h-24 rounded-2xl flex items-center justify-center mb-8 border border-outline-variant/20 group-hover:border-primary-fixed-dim/50 transition-all duration-500">
+            <span class="material-symbols-outlined text-4xl text-primary-fixed-dim">celebration</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Get Matched</h3>
+          <p class="text-slate-400">Receive ranked high-confidence matches with a match score and personalised explanation for every result.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Bento Grid -->
+  <section class="py-32 bg-surface-container-low px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
+        <div class="max-w-2xl">
+          <h2 class="text-4xl md:text-5xl font-black tracking-tight mb-4 leading-tight">Beyond the Standard<br/>Job Search Engine</h2>
+          <p class="text-slate-400 text-lg">A career ecosystem designed for the next generation of top-tier talent.</p>
+        </div>
+        <a href="{{ url_for('auth.register') }}" class="px-8 py-3 rounded-xl border border-primary-fixed-dim/30 text-primary-fixed-dim font-bold hover:bg-primary-fixed-dim/10 transition-all whitespace-nowrap">View All Features</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div class="md:col-span-8 glass p-10 rounded-3xl border border-outline-variant/10 flex flex-col justify-between overflow-hidden relative min-h-[400px]">
+          <div class="relative z-10">
+            <span class="material-symbols-outlined text-5xl text-primary-fixed-dim mb-6">psychology</span>
+            <h3 class="text-3xl font-bold mb-4">Deep Neural Matching</h3>
+            <p class="text-slate-400 max-w-md text-lg leading-relaxed">Our TF-IDF + cosine similarity engine doesn't just look for keywords; it understands the semantic context of your work history to predict future success.</p>
+          </div>
+          <div class="absolute right-0 bottom-0 w-1/2 h-full opacity-20 pointer-events-none">
+            <div class="w-full h-full bg-gradient-to-tl from-primary-fixed-dim/40 to-transparent blur-3xl"></div>
+          </div>
+          <div class="mt-8 flex gap-4 relative z-10">
+            <span class="px-4 py-1.5 rounded-full bg-primary-fixed-dim/10 text-primary-fixed-dim text-xs font-bold">TF-IDF Vectorisation</span>
+            <span class="px-4 py-1.5 rounded-full bg-primary-fixed-dim/10 text-primary-fixed-dim text-xs font-bold">Cosine Similarity</span>
+          </div>
+        </div>
+        <div class="md:col-span-4 bg-surface-container-highest p-10 rounded-3xl border border-outline-variant/10 flex flex-col justify-between">
+          <div>
+            <span class="material-symbols-outlined text-4xl text-primary-fixed-dim mb-6">notifications_active</span>
+            <h3 class="text-2xl font-bold mb-4">Smart Match Scoring</h3>
+            <p class="text-slate-400 leading-relaxed">Every job gets a 0–100 match score. Only your best matches surface to the top. No noise, just opportunity.</p>
+          </div>
+          <div class="mt-8 pt-6 border-t border-outline-variant/20 flex items-center justify-between">
+            <span class="text-sm font-semibold text-slate-500 uppercase">Engine Status</span>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-primary-fixed-dim rounded-full animate-pulse"></span>
+              <span class="text-sm text-primary-fixed-dim font-bold">Active</span>
+            </div>
+          </div>
+        </div>
+        <div class="md:col-span-4 bg-surface-container-highest p-10 rounded-3xl border border-outline-variant/10 flex flex-col">
+          <span class="material-symbols-outlined text-4xl text-primary-fixed-dim mb-6">insights</span>
+          <h3 class="text-2xl font-bold mb-4">Career Insights</h3>
+          <p class="text-slate-400 leading-relaxed">Track your application pipeline, salary trends, and skill gaps tailored specifically to your unique profile.</p>
+        </div>
+        <div class="md:col-span-8 bg-surface-container-low border border-outline-variant/10 rounded-3xl overflow-hidden group">
+          <div class="grid md:grid-cols-2 h-full">
+            <div class="p-10 flex flex-col justify-center">
+              <h3 class="text-2xl font-bold mb-4">Full Application Tracker</h3>
+              <p class="text-slate-400 mb-6">Kanban-style pipeline for every job you apply to — from applied, through interviews, to offer.</p>
+              <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-lg bg-surface-variant flex items-center justify-center">
+                  <span class="material-symbols-outlined text-slate-300">send</span>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-surface-variant flex items-center justify-center">
+                  <span class="material-symbols-outlined text-slate-300">groups</span>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-surface-variant flex items-center justify-center">
+                  <span class="material-symbols-outlined text-slate-300">celebration</span>
+                </div>
+              </div>
+            </div>
+            <div class="relative bg-surface-container-highest min-h-[200px] flex items-center justify-center">
+              <div class="text-center p-8">
+                <div class="text-6xl font-black text-primary-fixed-dim mb-2">5</div>
+                <div class="text-slate-400 font-medium">Active Applications</div>
+                <div class="mt-4 grid grid-cols-3 gap-2">
+                  <div class="bg-blue-500/20 rounded-lg p-2 text-center"><div class="text-blue-400 font-bold">3</div><div class="text-xs text-slate-500">Applied</div></div>
+                  <div class="bg-amber-500/20 rounded-lg p-2 text-center"><div class="text-amber-400 font-bold">1</div><div class="text-xs text-slate-500">Interview</div></div>
+                  <div class="bg-emerald-500/20 rounded-lg p-2 text-center"><div class="text-emerald-400 font-bold">1</div><div class="text-xs text-slate-500">Offer</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-32 px-8">
+    <div class="max-w-5xl mx-auto glass p-12 md:p-20 rounded-[3rem] text-center relative overflow-hidden border border-primary-fixed-dim/20">
+      <div class="absolute -top-24 -left-24 w-64 h-64 bg-primary-fixed-dim/10 rounded-full blur-[80px]"></div>
+      <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-primary-container/10 rounded-full blur-[80px]"></div>
+      <div class="relative z-10">
+        <h2 class="text-4xl md:text-6xl font-black mb-8 leading-tight">Ready to let AI handle the<br/>heavy lifting?</h2>
+        <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-12">Join 1M+ professionals who have optimised their careers using JobFindr's Neural matching technology.</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="{{ url_for('auth.register') }}" class="gradient-cta text-on-primary-fixed font-bold px-10 py-5 rounded-2xl text-xl shadow-xl hover:scale-105 transition-all active:scale-95">Get Started for Free</a>
+          <a href="{{ url_for('auth.login') }}" class="px-10 py-5 rounded-2xl border border-outline-variant text-white font-bold text-xl hover:bg-white/5 transition-all">Sign In</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-[#041329] w-full pt-20 pb-10">
+  <div class="max-w-7xl mx-auto px-8 grid grid-cols-2 md:grid-cols-4 gap-12 text-sm text-slate-400">
+    <div class="col-span-2 md:col-span-1">
+      <div class="text-xl font-bold text-[#38DEBB] mb-6">JobFindr</div>
+      <p class="mb-6 leading-relaxed">Architecting the future of human talent matching through ethical AI and neural precision.</p>
+    </div>
+    <div>
+      <h4 class="text-white font-bold mb-6">Platform</h4>
+      <ul class="space-y-4">
+        <li><a class="hover:text-[#38DEBB] transition-all hover:translate-x-1 inline-block" href="{{ url_for('auth.register') }}">Explore Jobs</a></li>
+        <li><a class="hover:text-[#38DEBB] transition-all hover:translate-x-1 inline-block" href="#">AI Matching</a></li>
+        <li><a class="hover:text-[#38DEBB] transition-all hover:translate-x-1 inline-block" href="{{ url_for('recruiter.company_profile', company_id=1) }}">Companies</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="text-white font-bold mb-6">Company</h4>
+      <ul class="space-y-4">
+        <li><a class="hover:text-[#38DEBB] transition-all hover:translate-x-1 inline-block" href="#">Privacy Policy</a></li>
+        <li><a class="hover:text-[#38DEBB] transition-all hover:translate-x-1 inline-block" href="#">Terms of Service</a></li>
+        <li><a class="hover:text-[#38DEBB] transition-all hover:translate-x-1 inline-block" href="#">AI Ethics</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="text-white font-bold mb-6">Support</h4>
+      <ul class="space-y-4">
+        <li><a class="hover:text-[#38DEBB] transition-all hover:translate-x-1 inline-block" href="#">Help Center</a></li>
+        <li><a class="hover:text-[#38DEBB] transition-all hover:translate-x-1 inline-block" href="{{ url_for('recommendations.api_recommend') }}">API Docs</a></li>
+        <li><a class="hover:text-[#38DEBB] transition-all hover:translate-x-1 inline-block" href="{{ url_for('recruiter.recruiter_portal') }}">Enterprise</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-8 mt-20 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium tracking-widest uppercase text-slate-500">
+    <span>© 2026 JobFindr AI. Neural Luminary Interface.</span>
+    <span class="text-[#38DEBB]">v1.0.0 · Python ML Edition</span>
+  </div>
+</footer>
+{% endblock %}

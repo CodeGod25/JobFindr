@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "Alex Chen",
+    "email": "alex@jobfindr.ai",
+    "password": "password123",
+    "title": "AI Specialist",
+    "location": "San Francisco, CA",
+    "bio": "Passionate about building intelligent systems that solve real-world problems. Experienced in machine learning, NLP, and scalable backend architecture.",
+    "skills": ["Python", "Machine Learning", "NLP", "TensorFlow", "PyTorch", "React", "TypeScript", "Docker", "Kubernetes", "SQL", "Data Science"],
+    "experience_years": 6,
+    "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuAUXbmXl5Qas9CptrKnCxSm3WXgurCwxykxpxoALHtmFM7-otBkJiQznMJmX9bpGCQx_VzGjwpSxpM4KhRCqWUimtVuQT6C86HU-UBUrbPR7P2ogda7RtV4vRTvjasyQ8YttmgPKZmhZgMRaBxbK_XCfJ7TsjJbojNk8x4teUzF44eRJHbXK1dJaLpO8Tzqbn83pKesh53ryIT406hvWnIgoGO2c3o5BcizSrYI_e82uhsD2LTC7G-2FQqbp0TrfUIetadanqSD3fw",
+    "applications": [1, 3, 4],
+    "saved_jobs": [2, 7, 9]
+  },
+  {
+    "id": 2,
+    "name": "Priya Sharma",
+    "email": "priya@jobfindr.ai",
+    "password": "password123",
+    "title": "Full Stack Developer",
+    "location": "New York, NY",
+    "bio": "Full-stack developer with a love for clean APIs and pixel-perfect UIs. Experience across web3, fintech, and healthcare verticals.",
+    "skills": ["JavaScript", "TypeScript", "React", "Node.js", "GraphQL", "PostgreSQL", "AWS", "Docker", "Redis", "Vue.js"],
+    "experience_years": 4,
+    "avatar": "",
+    "applications": [2, 6],
+    "saved_jobs": [10, 11]
+  },
+  {
+    "id": 3,
+    "name": "Marcus Johnson",
+    "email": "marcus@jobfindr.ai",
+    "password": "password123",
+    "title": "Data Scientist",
+    "location": "Chicago, IL",
+    "bio": "Data scientist specializing in statistical modeling, A/B experimentation, and recommendation systems at scale.",
+    "skills": ["Python", "R", "Apache Spark", "SQL", "Statistics", "Machine Learning", "Recommendation Systems", "Tableau", "Scikit-learn", "Pandas"],
+    "experience_years": 5,
+    "avatar": "",
+    "applications": [3, 13, 15],
+    "saved_jobs": [4, 8]
+  }
+]

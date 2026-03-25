@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}JobFindr | Recruiter Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto pt-28 pb-24 px-4 md:px-6">
+  <div class="flex items-center justify-between mb-10 flex-wrap gap-4">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-black tracking-tight flex items-center gap-3">
+        <span class="material-symbols-outlined text-emerald-400 text-4xl">business_center</span>
+        Recruiter Portal
+      </h1>
+      <p class="text-slate-400 mt-1 ml-14">Manage listings, discover top talent, and track applications.</p>
+    </div>
+    <button class="gradient-cta text-on-primary-fixed font-bold px-6 py-3 rounded-DEFAULT hover:scale-[1.02] transition-all flex items-center gap-2">
+      <span class="material-symbols-outlined text-sm">add</span> Post New Role
+    </button>
+  </div>
+
+  <!-- Recruiter Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+    <div class="glass-panel rounded-DEFAULT border border-emerald-400/20 p-5">
+      <span class="material-symbols-outlined text-emerald-400 mb-2 block">work</span>
+      <div class="text-3xl font-black text-primary-fixed-dim">{{ jobs|length }}</div>
+      <div class="text-xs text-slate-500 uppercase tracking-wide font-bold mt-1">Active Listings</div>
+    </div>
+    <div class="glass-panel rounded-DEFAULT border border-white/5 p-5">
+      <span class="material-symbols-outlined text-blue-400 mb-2 block">people</span>
+      <div class="text-3xl font-black text-primary">128</div>
+      <div class="text-xs text-slate-500 uppercase tracking-wide font-bold mt-1">Candidates Reviewed</div>
+    </div>
+    <div class="glass-panel rounded-DEFAULT border border-white/5 p-5">
+      <span class="material-symbols-outlined text-amber-400 mb-2 block">mark_email_read</span>
+      <div class="text-3xl font-black text-primary">34</div>
+      <div class="text-xs text-slate-500 uppercase tracking-wide font-bold mt-1">Interviews Scheduled</div>
+    </div>
+    <div class="glass-panel rounded-DEFAULT border border-white/5 p-5">
+      <span class="material-symbols-outlined text-purple-400 mb-2 block">celebration</span>
+      <div class="text-3xl font-black text-primary">7</div>
+      <div class="text-xs text-slate-500 uppercase tracking-wide font-bold mt-1">Hires This Month</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Active Listings -->
+    <div class="lg:col-span-2">
+      <h2 class="text-xl font-bold mb-5">Active Job Listings</h2>
+      <div class="space-y-4">
+        {% for job in jobs %}
+        <div class="glass-panel rounded-DEFAULT border border-white/5 hover:border-emerald-400/20 p-5 transition-all">
+          <div class="flex justify-between items-start gap-4">
+            <div class="flex-1 min-w-0">
+              <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" class="text-base font-bold hover:text-emerald-400 transition-colors">{{ job.title }}</a>
+              <p class="text-sm text-slate-400 mt-0.5">{{ job.location }} · {{ job.type }}</p>
+              <div class="flex gap-2 mt-2 flex-wrap">
+                {% for skill in job.skills[:3] %}
+                <span class="px-2 py-0.5 text-xs rounded-full bg-surface-container-highest text-slate-400">{{ skill }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <div class="text-sm font-bold text-primary">{{ job.salary_display }}</div>
+              <div class="text-xs text-slate-500 mt-1">{{ job.posted_at }}</div>
+              <div class="flex gap-2 mt-2 justify-end">
+                <button class="p-1.5 glass-panel border border-white/5 rounded-lg text-slate-400 hover:text-emerald-400 transition-colors" title="Edit">
+                  <span class="material-symbols-outlined text-sm">edit</span>
+                </button>
+                <button class="p-1.5 glass-panel border border-white/5 rounded-lg text-slate-400 hover:text-red-400 transition-colors" title="Delete">
+                  <span class="material-symbols-outlined text-sm">delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Company Profiles & Tools -->
+    <div class="space-y-5">
+      <div class="glass-panel rounded-DEFAULT border border-white/5 p-6">
+        <h3 class="font-bold mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-fixed-dim">business</span> Company Profiles
+        </h3>
+        <div class="space-y-3">
+          <a href="{{ url_for('recruiter.company_profile', company_id=1) }}" class="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-black border border-emerald-400/20">S</div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold group-hover:text-emerald-400 transition-colors">Stripe</p>
+              <p class="text-xs text-slate-500">Fintech · 4,000+ employees</p>
+            </div>
+            <span class="material-symbols-outlined text-slate-600 group-hover:text-emerald-400 transition-colors text-sm">arrow_forward</span>
+          </a>
+          <a href="{{ url_for('recruiter.company_profile', company_id=2) }}" class="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group">
+            <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 font-black border border-blue-400/20">O</div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold group-hover:text-emerald-400 transition-colors">OpenAI</p>
+              <p class="text-xs text-slate-500">AI Research · 700+ employees</p>
+            </div>
+            <span class="material-symbols-outlined text-slate-600 group-hover:text-emerald-400 transition-colors text-sm">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Recruiter Tools -->
+      <div class="glass-panel rounded-DEFAULT border border-white/5 p-6">
+        <h3 class="font-bold mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-fixed-dim">build</span> Recruiter Tools
+        </h3>
+        <div class="space-y-2">
+          <a href="{{ url_for('recommendations.api_recommend') }}" class="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group text-sm">
+            <span class="material-symbols-outlined text-emerald-400 text-sm">api</span>
+            <span class="group-hover:text-white transition-colors">ML Matching API</span>
+          </a>
+          <a href="{{ url_for('applications.applications') }}" class="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group text-sm">
+            <span class="material-symbols-outlined text-blue-400 text-sm">work_history</span>
+            <span class="group-hover:text-white transition-colors">View All Applications</span>
+          </a>
+          <a href="{{ url_for('jobs.career') }}" class="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group text-sm">
+            <span class="material-symbols-outlined text-purple-400 text-sm">trending_up</span>
+            <span class="group-hover:text-white transition-colors">Career Platform</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

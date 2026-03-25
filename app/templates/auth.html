@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block title %}JobFindr | {% if mode == 'register' %}Create Account{% else %}Sign In{% endif %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-6 py-20">
+  <!-- Background glows -->
+  <div class="fixed top-1/4 -left-32 w-96 h-96 bg-primary-container/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="fixed bottom-1/4 -right-32 w-96 h-96 bg-primary-fixed-dim/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+  <div class="w-full max-w-md z-10">
+    <!-- Logo -->
+    <div class="text-center mb-10">
+      <a href="{{ url_for('jobs.landing') }}" class="text-4xl font-black text-emerald-400 italic tracking-tight">JobFindr</a>
+      <p class="text-slate-400 mt-2 text-sm">AI-Powered Career Intelligence</p>
+    </div>
+
+    <!-- Tab Toggle -->
+    <div class="glass-panel rounded-2xl p-1 flex mb-8 border border-white/5">
+      <a href="{{ url_for('auth.login') }}"
+         class="flex-1 py-3 text-center rounded-xl font-bold text-sm transition-all {% if mode == 'login' %}bg-emerald-500/20 text-emerald-400{% else %}text-slate-500 hover:text-slate-300{% endif %}">
+        Sign In
+      </a>
+      <a href="{{ url_for('auth.register') }}"
+         class="flex-1 py-3 text-center rounded-xl font-bold text-sm transition-all {% if mode == 'register' %}bg-emerald-500/20 text-emerald-400{% else %}text-slate-500 hover:text-slate-300{% endif %}">
+        Create Account
+      </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="glass-panel rounded-2xl p-8 border border-white/5 ai-glow">
+      {% if error %}
+      <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm flex items-center gap-3">
+        <span class="material-symbols-outlined text-lg">error</span>
+        {{ error }}
+      </div>
+      {% endif %}
+
+      {% if mode == 'login' %}
+
+      <!-- OAuth Buttons -->
+      <div class="space-y-3 mb-6">
+        <a href="{{ url_for('oauth.google_login') }}"
+           class="w-full flex items-center justify-center gap-3 py-3 glass-panel border border-white/10 rounded-xl text-sm font-semibold text-slate-300 hover:border-emerald-400/30 hover:text-white transition-all active:scale-95">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </a>
+        <a href="{{ url_for('oauth.linkedin_login') }}"
+           class="w-full flex items-center justify-center gap-3 py-3 glass-panel border border-white/10 rounded-xl text-sm font-semibold text-slate-300 hover:border-blue-400/30 hover:text-white transition-all active:scale-95">
+          <svg class="w-5 h-5" fill="#0077B5" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          Continue with LinkedIn
+        </a>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="flex-1 h-px bg-white/5"></div>
+        <span class="text-xs text-slate-600 font-semibold uppercase tracking-widest">or email</span>
+        <div class="flex-1 h-px bg-white/5"></div>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-5">
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Email Address</label>
+          <div class="flex items-center bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 focus-within:border-emerald-400/30 transition-colors">
+            <span class="material-symbols-outlined text-slate-500 mr-3 text-sm">mail</span>
+            <input type="email" name="email" id="emailInput" required autocomplete="email"
+                   class="bg-transparent border-none focus:ring-0 text-sm text-white w-full placeholder:text-slate-600"
+                   placeholder="your@email.com"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Password</label>
+          <div class="flex items-center bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 focus-within:border-emerald-400/30 transition-colors">
+            <span class="material-symbols-outlined text-slate-500 mr-3 text-sm">lock</span>
+            <input type="password" name="password" id="passInput" required autocomplete="current-password"
+                   class="bg-transparent border-none focus:ring-0 text-sm text-white w-full placeholder:text-slate-600"
+                   placeholder="••••••••"/>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <label class="flex items-center gap-2 text-slate-400 cursor-pointer">
+            <input type="checkbox" class="rounded border-slate-600 bg-transparent text-emerald-400 focus:ring-emerald-400/30"/>
+            Remember me
+          </label>
+          <a href="#" class="text-emerald-400 hover:text-emerald-300 transition-colors">Forgot password?</a>
+        </div>
+        <button type="submit" class="w-full gradient-cta text-on-primary-fixed font-bold py-4 rounded-xl hover:scale-[1.02] transition-all active:scale-95 shadow-lg shadow-emerald-500/20 mt-2">
+          Sign In
+        </button>
+
+        <!-- Demo credentials -->
+        <div class="pt-4 border-t border-white/5 space-y-2">
+          <p class="text-xs text-slate-500 text-center font-semibold uppercase tracking-widest mb-3">Quick Demo Login</p>
+          <button type="button" onclick="fillDemo('alex@jobfindr.ai','password123')"
+                  class="w-full flex items-center justify-between px-4 py-3 glass-panel border border-white/5 rounded-xl hover:border-emerald-400/20 hover:bg-emerald-500/5 transition-all group">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-sm font-black border border-emerald-400/20">A</div>
+              <div class="text-left">
+                <p class="text-xs font-bold text-slate-300 group-hover:text-white transition-colors">Alex Chen — Candidate</p>
+                <p class="text-[10px] text-slate-500 font-mono">alex@jobfindr.ai</p>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-slate-600 group-hover:text-emerald-400 transition-colors text-sm">login</span>
+          </button>
+          <button type="button" onclick="fillDemo('recruiter@jobfindr.ai','recruit123')"
+                  class="w-full flex items-center justify-between px-4 py-3 glass-panel border border-white/5 rounded-xl hover:border-blue-400/20 hover:bg-blue-500/5 transition-all group">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-sm font-black border border-blue-400/20">S</div>
+              <div class="text-left">
+                <p class="text-xs font-bold text-slate-300 group-hover:text-white transition-colors">Sarah Lin — Recruiter</p>
+                <p class="text-[10px] text-slate-500 font-mono">recruiter@jobfindr.ai</p>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-slate-600 group-hover:text-blue-400 transition-colors text-sm">login</span>
+          </button>
+        </div>
+      </form>
+
+      {% else %}
+      <!-- OAuth for Register too -->
+      <div class="space-y-3 mb-6">
+        <a href="{{ url_for('oauth.google_login') }}"
+           class="w-full flex items-center justify-center gap-3 py-3 glass-panel border border-white/10 rounded-xl text-sm font-semibold text-slate-300 hover:border-emerald-400/30 hover:text-white transition-all active:scale-95">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Sign up with Google
+        </a>
+        <a href="{{ url_for('oauth.linkedin_login') }}"
+           class="w-full flex items-center justify-center gap-3 py-3 glass-panel border border-white/10 rounded-xl text-sm font-semibold text-slate-300 hover:border-blue-400/30 hover:text-white transition-all active:scale-95">
+          <svg class="w-5 h-5" fill="#0077B5" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          Sign up with LinkedIn
+        </a>
+      </div>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="flex-1 h-px bg-white/5"></div>
+        <span class="text-xs text-slate-600 font-semibold uppercase tracking-widest">or email</span>
+        <div class="flex-1 h-px bg-white/5"></div>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-5">
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Full Name</label>
+          <input name="name" type="text" placeholder="Your full name"
+                 class="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:ring-1 focus:ring-emerald-400/30 focus:outline-none"/>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Email Address</label>
+          <div class="flex items-center bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 focus-within:border-emerald-400/30 transition-colors">
+            <span class="material-symbols-outlined text-slate-500 mr-3 text-sm">mail</span>
+            <input name="email" type="email" placeholder="your@email.com" autocomplete="email"
+                   class="bg-transparent border-none focus:ring-0 text-sm text-white w-full placeholder:text-slate-600"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Job Title</label>
+          <div class="flex items-center bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 focus-within:border-emerald-400/30 transition-colors">
+            <span class="material-symbols-outlined text-slate-500 mr-3 text-sm">work</span>
+            <input name="title" type="text" placeholder="e.g. ML Engineer, Product Designer"
+                   class="bg-transparent border-none focus:ring-0 text-sm text-white w-full placeholder:text-slate-600"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Password</label>
+          <div class="flex items-center bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 focus-within:border-emerald-400/30 transition-colors">
+            <span class="material-symbols-outlined text-slate-500 mr-3 text-sm">lock</span>
+            <input name="password" type="password" placeholder="Create a password" autocomplete="new-password"
+                   class="bg-transparent border-none focus:ring-0 text-sm text-white w-full placeholder:text-slate-600"/>
+          </div>
+        </div>
+        <button type="submit" class="w-full gradient-cta text-on-primary-fixed font-bold py-4 rounded-xl hover:scale-[1.02] transition-all active:scale-95 shadow-lg shadow-emerald-500/20 mt-2">
+          Create Neural Profile
+        </button>
+        <p class="text-xs text-center text-slate-500">
+          By signing up you agree to our <a href="#" class="text-emerald-400">Terms</a> and <a href="#" class="text-emerald-400">Privacy Policy</a>.
+        </p>
+      </form>
+      {% endif %}
+    </div>
+
+    <!-- OAuth Notice Modal -->
+    <div id="oauthModal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-6">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeOauth()"></div>
+      <div class="relative glass-panel border border-white/10 rounded-2xl p-8 max-w-sm w-full z-10 ai-glow">
+        <div class="text-center">
+          <span class="material-symbols-outlined text-4xl text-primary-fixed-dim mb-4 block">lock_open</span>
+          <h3 class="text-lg font-black mb-2" id="oauthTitle">OAuth Integration</h3>
+          <p class="text-sm text-slate-400 mb-6">This is a demo environment. To enable real <span id="oauthProvider"></span> sign-in, configure OAuth client credentials in your <span class="font-mono text-emerald-400">.env</span> file and set up the callback URLs.</p>
+          <div class="text-left bg-surface-container-lowest rounded-xl p-4 mb-6 text-xs font-mono text-slate-400 space-y-1">
+            <p><span class="text-emerald-400">OAUTH_CLIENT_ID</span>=your-client-id</p>
+            <p><span class="text-emerald-400">OAUTH_CLIENT_SECRET</span>=your-secret</p>
+          </div>
+          <button onclick="closeOauth()" class="w-full gradient-cta text-on-primary-fixed font-bold py-3 rounded-xl">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social proof -->
+    <div class="mt-8 text-center">
+      <p class="text-xs text-slate-600 mb-4 uppercase tracking-widest font-bold">Trusted by engineers at</p>
+      <div class="flex justify-center items-center gap-8 opacity-40">
+        <span class="text-slate-400 font-bold text-sm">Stripe</span>
+        <span class="text-slate-400 font-bold text-sm">OpenAI</span>
+        <span class="text-slate-400 font-bold text-sm">Netflix</span>
+        <span class="text-slate-400 font-bold text-sm">Figma</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function fillDemo(email, pass) {
+  document.getElementById('emailInput').value = email;
+  document.getElementById('passInput').value = pass;
+  document.getElementById('emailInput').closest('form').submit();
+}
+function oauthNotice(provider) {
+  document.getElementById('oauthProvider').textContent = provider;
+  document.getElementById('oauthTitle').textContent = provider + ' Sign-In';
+  document.getElementById('oauthModal').classList.remove('hidden');
+}
+function closeOauth() {
+  document.getElementById('oauthModal').classList.add('hidden');
+}
+</script>
+{% endblock %}

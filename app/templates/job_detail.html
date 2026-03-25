@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }} at {{ job.company }} | JobFindr{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto pt-28 pb-24 px-4 md:px-6">
+
+  <!-- Back Navigation -->
+  <a href="{{ url_for('jobs.feed') }}" class="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors mb-8 group">
+    <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
+    Back to Feed
+  </a>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Job Header Card -->
+      <div class="glass-panel ai-glow rounded-DEFAULT border border-emerald-400/20 p-8">
+        <div class="flex justify-between items-start gap-6">
+          <div class="flex gap-5">
+            <div class="w-16 h-16 rounded-DEFAULT bg-surface-container-high flex items-center justify-center text-emerald-400 text-3xl font-black border border-white/10 flex-shrink-0">
+              {{ job.company[0] }}
+            </div>
+            <div>
+              <h1 class="text-2xl md:text-3xl font-black text-primary leading-tight mb-2">{{ job.title }}</h1>
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-on-surface-variant">
+                <a href="{{ url_for('recruiter.company_profile', company_id=1) }}" class="font-semibold hover:text-emerald-400 transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">business</span> {{ job.company }}
+                </a>
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">location_on</span> {{ job.location }}
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">schedule</span> {{ job.posted_at }}
+                </span>
+              </div>
+              <div class="flex gap-2 mt-3 flex-wrap">
+                <span class="px-3 py-1 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-400/20 font-medium">{{ job.type }}</span>
+                <span class="px-3 py-1 text-xs rounded-full bg-surface-container-highest text-slate-400">{{ job.dept }}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Match Score Ring -->
+          <div class="flex flex-col items-center gap-1 flex-shrink-0">
+            <div class="relative w-20 h-20 flex items-center justify-center">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
+                <circle class="text-surface-container-highest" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="5"></circle>
+                <circle class="text-primary-fixed-dim" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor"
+                  stroke-dasharray="175.9" stroke-dashoffset="{{ job.svg_offset | default(40) }}" stroke-width="5" stroke-linecap="round"></circle>
+              </svg>
+              <span class="absolute text-base font-black text-primary-fixed-dim">{{ job.match_score }}%</span>
+            </div>
+            <span class="text-xs text-slate-500 font-semibold">Match Score</span>
+          </div>
+        </div>
+
+        <!-- Neural Match Reason -->
+        <div class="mt-6 bg-surface-container-low/50 rounded-DEFAULT p-4 border border-emerald-400/10">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-primary-fixed-dim text-sm">auto_awesome</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-primary-fixed-dim">Neural Match Reason</span>
+          </div>
+          <p class="text-sm text-on-surface-variant leading-relaxed">{{ job.match_reason | safe }}</p>
+        </div>
+      </div>
+
+      <!-- Score Breakdown Radar Chart -->
+      {% if breakdown %}
+      <div class="glass-panel rounded-DEFAULT border border-white/5 p-8">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-fixed-dim">radar</span>
+          ML Score Breakdown
+          <span class="text-xs font-normal text-slate-500 ml-auto">5-axis neural analysis</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <!-- Chart -->
+          <div class="relative h-64">
+            <canvas id="radarChart"></canvas>
+          </div>
+          <!-- Axis Legend -->
+          <div class="space-y-4">
+            {% set axes = [
+              ('skills_match',   'Skills Match',    'bolt',       breakdown.skills_match),
+              ('role_alignment', 'Role Alignment',  'psychology', breakdown.role_alignment),
+              ('salary_fit',     'Salary Fit',      'payments',   breakdown.salary_fit),
+              ('seniority',      'Seniority Match', 'trending_up',breakdown.seniority),
+              ('demand_score',   'Market Demand',   'bar_chart',  breakdown.demand_score),
+            ] %}
+            {% for key, label, icon, val in axes %}
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <div class="flex items-center gap-1.5 text-on-surface">
+                  <span class="material-symbols-outlined text-primary-fixed-dim text-xs">{{ icon }}</span>
+                  {{ label }}
+                </div>
+                <span class="text-primary-fixed-dim font-bold">{{ val }}%</span>
+              </div>
+              <div class="h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all" style="width: {{ val }}%; background: linear-gradient(90deg, #34d399, #10b981)"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Description -->
+      <div class="glass-panel rounded-DEFAULT border border-white/5 p-8">
+        <h2 class="text-xl font-bold mb-4">About the Role</h2>
+        <p class="text-on-surface-variant leading-relaxed">{{ job.description }}</p>
+
+        <h3 class="text-lg font-bold mt-8 mb-4">Required Skills</h3>
+        <div class="flex flex-wrap gap-2">
+          {% for skill in job.skills %}
+          <span class="px-4 py-2 rounded-full bg-surface-container-highest border border-white/5 text-sm font-medium hover:border-emerald-400/30 hover:text-emerald-400 transition-colors cursor-default">{{ skill }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="space-y-5">
+
+      <!-- Apply Card -->
+      <div class="glass-panel rounded-DEFAULT border border-emerald-400/20 p-6">
+        <div class="mb-5">
+          <div class="text-xs uppercase tracking-tighter text-on-surface-variant/60 font-bold mb-1">Salary Range</div>
+          <div class="text-2xl font-black text-primary">{{ job.salary_display }}</div>
+        </div>
+        <a href="{{ url_for('applications.applications') }}" class="block w-full py-4 bg-gradient-to-br from-primary-fixed to-primary-fixed-dim text-on-primary-fixed font-bold rounded-DEFAULT shadow-xl shadow-emerald-500/20 text-center hover:scale-[1.02] transition-all active:scale-95 mb-3">
+          Quick Apply
+        </a>
+        <button class="w-full py-3 glass-panel border border-white/10 rounded-DEFAULT text-on-surface-variant font-medium hover:border-primary-fixed-dim/30 hover:text-primary-fixed-dim transition-all">
+          <span class="material-symbols-outlined align-middle mr-1 text-sm">bookmark</span> Save Job
+        </button>
+        <div class="mt-5 pt-5 border-t border-white/5 space-y-3 text-sm text-slate-400">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-400 text-sm">business</span>
+            <a href="{{ url_for('recruiter.company_profile', company_id=1) }}" class="hover:text-emerald-400 transition-colors">View Company Profile</a>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-400 text-sm">share</span>
+            <span class="cursor-pointer hover:text-emerald-400 transition-colors">Share this job</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-400 text-sm">flag</span>
+            <span class="cursor-pointer hover:text-red-400 transition-colors">Report listing</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Similar Jobs -->
+      {% if similar_jobs %}
+      <div class="glass-panel rounded-DEFAULT border border-white/5 p-6">
+        <h3 class="text-base font-bold mb-4">Similar Roles</h3>
+        <div class="space-y-3">
+          {% for sj in similar_jobs %}
+          <a href="{{ url_for('jobs.job_detail', job_id=sj.id) }}" class="block p-3 hover:bg-white/5 rounded-xl transition-all group">
+            <div class="flex items-center justify-between">
+              <div class="min-w-0">
+                <p class="text-sm font-semibold group-hover:text-emerald-400 transition-colors truncate">{{ sj.title }}</p>
+                <p class="text-xs text-slate-500">{{ sj.company }}</p>
+              </div>
+              <span class="text-xs font-black text-primary-fixed-dim ml-3 flex-shrink-0">{{ sj.match_score }}%</span>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+{% if breakdown %}
+const radarCtx = document.getElementById('radarChart');
+if (radarCtx) {
+  const breakdown = {{ breakdown | tojson }};
+  new Chart(radarCtx, {
+    type: 'radar',
+    data: {
+      labels: ['Skills Match', 'Role Alignment', 'Salary Fit', 'Seniority', 'Market Demand'],
+      datasets: [{
+        label: 'Match Score',
+        data: [
+          breakdown.skills_match,
+          breakdown.role_alignment,
+          breakdown.salary_fit,
+          breakdown.seniority,
+          breakdown.demand_score,
+        ],
+        backgroundColor: 'rgba(52, 211, 153, 0.15)',
+        borderColor: '#34d399',
+        borderWidth: 2,
+        pointBackgroundColor: '#10b981',
+        pointBorderColor: '#fff',
+        pointRadius: 5,
+        pointHoverRadius: 7,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          min: 0,
+          max: 100,
+          ticks: {
+            stepSize: 25,
+            color: '#475569',
+            backdropColor: 'transparent',
+            font: { size: 9 }
+          },
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          angleLines: { color: 'rgba(255,255,255,0.06)' },
+          pointLabels: {
+            color: '#94a3b8',
+            font: { size: 11, weight: '600' }
+          }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1e293b',
+          borderColor: 'rgba(52,211,153,0.2)',
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => ` ${ctx.raw}%`
+          }
+        }
+      }
+    }
+  });
+}
+{% endif %}
+</script>
+{% endblock %}

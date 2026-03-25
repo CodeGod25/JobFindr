@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}JobFindr | Career Platform{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto pt-28 pb-24 px-4 md:px-6">
+  <div class="text-center mb-16">
+    <span class="inline-block px-4 py-1.5 rounded-full bg-surface-container-highest border border-emerald-400/20 text-primary-fixed-dim text-sm font-semibold uppercase tracking-wider mb-6">
+      Career Intelligence Platform
+    </span>
+    <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-6">
+      Architect Your<br/><span class="text-primary-fixed-dim text-glow italic">Perfect Career</span>
+    </h1>
+    <p class="text-lg text-on-surface-variant max-w-2xl mx-auto">
+      Data-driven insights, skill benchmarks, and AI-powered tools to help you grow faster and smarter.
+    </p>
+  </div>
+
+  <!-- Feature Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+    <a href="{{ url_for('recommendations.recommendations') }}" class="glass-panel rounded-DEFAULT border border-emerald-400/20 ai-glow p-8 group hover:border-emerald-400/40 transition-all">
+      <span class="material-symbols-outlined text-5xl text-primary-fixed-dim mb-5 block group-hover:scale-110 transition-transform">psychology</span>
+      <h3 class="text-2xl font-bold mb-3">Neural Job Matching</h3>
+      <p class="text-slate-400 leading-relaxed">TF-IDF powered semantic matching finds jobs aligned with your full career context — not just keywords.</p>
+      <div class="mt-5 flex items-center gap-2 text-emerald-400 font-semibold text-sm">
+        Get matched now <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </a>
+    <a href="{{ url_for('jobs.dashboard') }}" class="glass-panel rounded-DEFAULT border border-white/5 p-8 group hover:border-emerald-400/20 transition-all">
+      <span class="material-symbols-outlined text-5xl text-primary-fixed-dim mb-5 block group-hover:scale-110 transition-transform">bar_chart</span>
+      <h3 class="text-2xl font-bold mb-3">Career Dashboard</h3>
+      <p class="text-slate-400 leading-relaxed">Track your applications, match scores, and skill benchmarks all in one place.</p>
+      <div class="mt-5 flex items-center gap-2 text-emerald-400 font-semibold text-sm">
+        View Dashboard <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </a>
+    <a href="{{ url_for('applications.applications') }}" class="glass-panel rounded-DEFAULT border border-white/5 p-8 group hover:border-emerald-400/20 transition-all">
+      <span class="material-symbols-outlined text-5xl text-primary-fixed-dim mb-5 block group-hover:scale-110 transition-transform">work_history</span>
+      <h3 class="text-2xl font-bold mb-3">Application Pipeline</h3>
+      <p class="text-slate-400 leading-relaxed">Kanban-style tracker to manage every application stage from first apply to final offer.</p>
+      <div class="mt-5 flex items-center gap-2 text-emerald-400 font-semibold text-sm">
+        Track Applications <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </a>
+    <a href="{{ url_for('profile.profile') }}" class="glass-panel rounded-DEFAULT border border-white/5 p-8 group hover:border-emerald-400/20 transition-all">
+      <span class="material-symbols-outlined text-5xl text-primary-fixed-dim mb-5 block group-hover:scale-110 transition-transform">edit_note</span>
+      <h3 class="text-2xl font-bold mb-3">Profile Builder</h3>
+      <p class="text-slate-400 leading-relaxed">Update your skills and bio to continuously improve your AI match scores across all job listings.</p>
+      <div class="mt-5 flex items-center gap-2 text-emerald-400 font-semibold text-sm">
+        Build Profile <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Salary Insights -->
+  <div class="glass-panel rounded-DEFAULT border border-white/5 p-8 mb-8">
+    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary-fixed-dim">payments</span> Market Salary Insights
+    </h2>
+    <div class="space-y-4">
+      {% for role, low, high, color in [
+        ('ML Engineer', 185, 280, 'bg-emerald-400'),
+        ('Data Scientist', 145, 245, 'bg-blue-400'),
+        ('NLP Researcher', 200, 350, 'bg-purple-400'),
+        ('MLOps Engineer', 140, 200, 'bg-amber-400'),
+        ('AI Product Manager', 160, 240, 'bg-pink-400')
+      ] %}
+      <div>
+        <div class="flex justify-between text-sm mb-2">
+          <span class="font-medium text-on-surface">{{ role }}</span>
+          <span class="text-on-surface-variant">${{ low }}k – ${{ high }}k</span>
+        </div>
+        <div class="h-2 bg-surface-container-highest rounded-full overflow-hidden">
+          <div class="{{ color }} h-full rounded-full opacity-70" style="width: {{ ((high - 100) / 300 * 100)|int }}%"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="text-center">
+    <a href="{{ url_for('jobs.feed') }}" class="gradient-cta text-on-primary-fixed font-bold px-12 py-5 rounded-DEFAULT text-lg hover:scale-[1.02] transition-all active:scale-95 shadow-xl shadow-emerald-500/20 inline-block">
+      Start Exploring Jobs
+    </a>
+  </div>
+</div>
+{% endblock %}

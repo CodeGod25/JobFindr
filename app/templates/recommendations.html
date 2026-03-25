@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}JobFindr | AI Recommendations{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto pt-28 pb-24 px-4 md:px-6">
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="material-symbols-outlined text-4xl text-primary-fixed-dim">{{ algo_icon }}</span>
+      <h1 class="text-3xl md:text-4xl font-black tracking-tight">Neural Recommendations</h1>
+    </div>
+    <p class="text-on-surface-variant text-lg ml-14">AI-ranked matches built from your skill profile — updated in real time.</p>
+  </div>
+
+  <!-- Algorithm Toggle -->
+  <div class="glass-panel rounded-DEFAULT border border-white/5 p-2 mb-6 flex gap-2 flex-wrap">
+    {% for a, label, icon in [('tfidf','TF-IDF Neural','psychology'), ('keyword','Keyword Match','tag'), ('hybrid','Hybrid Engine','science')] %}
+    <a href="{{ url_for('recommendations.recommendations', algo=a) }}"
+       class="flex-1 min-w-[120px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold transition-all
+              {% if algo == a %}bg-gradient-to-br from-primary-fixed to-primary-fixed-dim text-on-primary-fixed shadow-lg shadow-emerald-500/20{% else %}text-slate-400 hover:bg-white/5{% endif %}">
+      <span class="material-symbols-outlined text-sm">{{ icon }}</span>
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Algo Explanation Badge -->
+  <div class="flex items-center gap-3 mb-8 p-4 glass-panel border border-primary-fixed-dim/10 rounded-xl">
+    <span class="material-symbols-outlined text-primary-fixed-dim flex-shrink-0">info</span>
+    <p class="text-sm">
+      {% if algo == 'tfidf' %}
+        <span class="font-bold text-primary-fixed-dim">TF-IDF Neural:</span>
+        <span class="text-slate-400"> Term Frequency-Inverse Document Frequency vectorisation + cosine similarity. Captures semantic meaning beyond exact keywords using bigrams and sublinear TF damping.</span>
+      {% elif algo == 'keyword' %}
+        <span class="font-bold text-primary-fixed-dim">Keyword Match:</span>
+        <span class="text-slate-400"> Jaccard similarity on raw skill token sets — simple, transparent, and great for validating exact skill overlaps between your profile and job requirements.</span>
+      {% else %}
+        <span class="font-bold text-primary-fixed-dim">Hybrid Engine:</span>
+        <span class="text-slate-400"> Weighted blend: 70% TF-IDF semantic score + 30% Keyword Jaccard overlap. Balances nuanced semantic matching with explicit skill coverage.</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Profile Summary -->
+  <div class="glass-panel rounded-DEFAULT border border-emerald-400/20 p-6 mb-8 flex items-center gap-6 flex-wrap">
+    <div class="flex items-center gap-4">
+      <div class="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-2xl font-black border-2 border-emerald-400/30">
+        {{ user.name[0] }}
+      </div>
+      <div>
+        <p class="font-bold text-lg">{{ user.name }}</p>
+        <p class="text-slate-400 text-sm">{{ user.title }}</p>
+      </div>
+    </div>
+    <div class="flex-1 flex flex-wrap gap-2">
+      {% for skill in user.skills[:8] %}
+      <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/20 text-emerald-400 text-xs font-semibold">{{ skill }}</span>
+      {% endfor %}
+      {% if user.skills|length > 8 %}
+      <span class="px-3 py-1 rounded-full bg-surface-container-highest text-slate-500 text-xs font-semibold">+{{ user.skills|length - 8 }} more</span>
+      {% endif %}
+    </div>
+    <a href="{{ url_for('profile.profile') }}" class="text-sm text-emerald-400 hover:underline flex items-center gap-1">
+      <span class="material-symbols-outlined text-sm">edit</span> Update Skills
+    </a>
+  </div>
+
+  <!-- Quick API Test Widget -->
+  <div class="glass-panel rounded-DEFAULT border border-white/5 p-6 mb-8">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="material-symbols-outlined text-primary-fixed-dim text-sm">terminal</span>
+      <span class="text-xs font-bold uppercase tracking-widest text-primary-fixed-dim">Live Skill Query — API Test</span>
+    </div>
+    <div class="flex gap-3 flex-wrap">
+      <input id="customSkillInput" type="text" placeholder="Type skills… e.g. Python, NLP, machine learning"
+             class="flex-1 min-w-[200px] bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:ring-1 focus:ring-emerald-400/30 focus:outline-none"/>
+      <select id="algoSelect" class="bg-surface-container-lowest border border-white/5 rounded-xl px-3 py-3 text-sm text-slate-300 focus:outline-none">
+        <option value="tfidf" {% if algo == 'tfidf' %}selected{% endif %}>TF-IDF</option>
+        <option value="keyword" {% if algo == 'keyword' %}selected{% endif %}>Keyword</option>
+        <option value="hybrid" {% if algo == 'hybrid' %}selected{% endif %}>Hybrid</option>
+      </select>
+      <button onclick="runCustomRecommend()" class="gradient-cta text-on-primary-fixed font-bold px-6 py-3 rounded-xl hover:scale-[1.02] transition-all active:scale-95">
+        Run
+      </button>
+    </div>
+    <div id="customResults" class="hidden mt-4 text-sm text-slate-400"></div>
+  </div>
+
+  <!-- Recommendations List -->
+  <div class="space-y-5">
+    {% for job in jobs %}
+    <article class="glass-panel rounded-DEFAULT border {% if job.match_score >= 85 %}border-emerald-400/25 ai-glow{% else %}border-white/10{% endif %} p-6 group hover:border-emerald-400/30 transition-all duration-300">
+      <div class="flex gap-4 items-start">
+        <!-- Rank badge -->
+        <div class="flex-shrink-0 w-8 h-8 rounded-full {% if loop.index <= 3 %}bg-gradient-to-br from-primary-fixed to-primary-fixed-dim text-on-primary-fixed{% else %}bg-surface-container-highest text-slate-500{% endif %} flex items-center justify-center text-xs font-black">
+          {{ loop.index }}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start gap-4">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-lg font-bold text-primary group-hover:text-primary-fixed-dim transition-colors">{{ job.title }}</h2>
+                {% if job.algo_label %}
+                <span class="px-2 py-0.5 text-[10px] rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-400/20 font-bold uppercase tracking-wider flex-shrink-0">{{ job.algo_label }}</span>
+                {% endif %}
+              </div>
+              <p class="text-on-surface-variant text-sm font-medium">{{ job.company }} · {{ job.location }}</p>
+              <div class="flex gap-2 mt-2 flex-wrap">
+                <span class="px-2 py-0.5 text-xs rounded-full bg-surface-container-highest text-slate-400">{{ job.type }}</span>
+                {% for skill in job.skills[:3] %}
+                <span class="px-2 py-0.5 text-xs rounded-full bg-emerald-500/10 text-emerald-400">{{ skill }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            <!-- Match Ring -->
+            <div class="flex flex-col items-center gap-1 flex-shrink-0">
+              <div class="relative w-14 h-14">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
+                  <circle class="text-surface-container-highest" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="4"></circle>
+                  <circle class="text-primary-fixed-dim" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor"
+                    stroke-dasharray="175.9" stroke-dashoffset="{{ job.svg_offset | default(70) }}" stroke-width="4" stroke-linecap="round"></circle>
+                </svg>
+                <span class="absolute inset-0 flex items-center justify-center text-xs font-black text-primary-fixed-dim">{{ job.match_score }}%</span>
+              </div>
+            </div>
+          </div>
+
+          {% if job.match_reason %}
+          <div class="mt-3 text-xs text-on-surface-variant bg-surface-container-low/40 rounded-xl p-3 border border-emerald-400/10">
+            <span class="material-symbols-outlined text-primary-fixed-dim text-xs align-middle mr-1">auto_awesome</span>
+            {{ job.match_reason | safe }}
+          </div>
+          {% endif %}
+
+          <div class="flex items-center justify-between mt-4">
+            <span class="text-sm font-bold text-primary">{{ job.salary_display }}</span>
+            <div class="flex gap-2">
+              <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" class="px-4 py-2 text-sm glass-panel border border-emerald-400/20 text-emerald-400 font-semibold rounded-xl hover:bg-emerald-500/10 transition-all">
+                View Details
+              </a>
+              <a href="{{ url_for('applications.applications') }}" class="px-4 py-2 text-sm bg-gradient-to-br from-primary-fixed to-primary-fixed-dim text-on-primary-fixed font-bold rounded-xl hover:scale-[1.02] transition-all active:scale-95">
+                Apply
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function runCustomRecommend() {
+  const input = document.getElementById('customSkillInput').value.trim();
+  const algo = document.getElementById('algoSelect').value;
+  const resultsDiv = document.getElementById('customResults');
+  if (!input) return;
+
+  resultsDiv.innerHTML = '<span class="material-symbols-outlined animate-spin text-emerald-400 text-xs align-middle">autorenew</span> Running ' + algo + ' analysis...';
+  resultsDiv.classList.remove('hidden');
+
+  try {
+    const resp = await fetch('/api/recommend', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({skills: input, algo: algo, top_n: 5})
+    });
+    const data = await resp.json();
+    if (data.results) {
+      const algoTag = `<span class="px-2 py-0.5 text-[10px] rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-400/20 font-bold uppercase">${data.algo}</span>`;
+      resultsDiv.innerHTML = `<div class="flex items-center gap-2 font-bold text-emerald-400 mb-3">Top ${data.count} matches via ${algoTag}</div>` +
+        data.results.map((j, i) => `
+          <div class="flex justify-between items-center py-1.5 border-b border-white/5">
+            <span class="text-slate-300">${i+1}. ${j.title} <span class="text-slate-500">@ ${j.company}</span></span>
+            <span class="text-primary-fixed-dim font-bold">${j.match_score}%</span>
+          </div>`).join('');
+    }
+  } catch (e) {
+    resultsDiv.innerHTML = '<span class="text-red-400">Error running recommendation</span>';
+  }
+}
+document.getElementById('customSkillInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') runCustomRecommend();
+});
+</script>
+{% endblock %}

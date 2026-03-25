@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+{% block title %}{{ user.name }} | Profile · JobFindr{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto pt-28 pb-24 px-4 md:px-6">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Profile Card -->
+    <div class="space-y-5">
+      <div class="glass-panel rounded-DEFAULT border border-emerald-400/20 p-8 text-center">
+        <div class="w-24 h-24 rounded-full mx-auto mb-4 bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-4xl font-black border-4 border-emerald-400/30 overflow-hidden">
+          {% if user.avatar %}
+          <img src="{{ user.avatar }}" alt="{{ user.name }}" class="w-full h-full object-cover"/>
+          {% else %}
+          {{ user.name[0] }}
+          {% endif %}
+        </div>
+        <h1 class="text-2xl font-black mb-1">{{ user.name }}</h1>
+        <p class="text-emerald-400 font-semibold mb-1">{{ user.title }}</p>
+        <p class="text-slate-500 text-sm flex items-center justify-center gap-1 mb-5">
+          <span class="material-symbols-outlined text-sm">location_on</span> {{ user.location }}
+        </p>
+        {% if not user.is_recruiter %}
+        <div class="flex gap-3 justify-center">
+          <a href="{{ url_for('jobs.feed') }}" class="flex-1 py-2.5 gradient-cta text-on-primary-fixed font-bold rounded-DEFAULT text-sm hover:scale-[1.02] transition-all text-center">
+            Find Jobs
+          </a>
+          <a href="{{ url_for('recommendations.recommendations') }}" class="flex-1 py-2.5 glass-panel border border-emerald-400/20 text-emerald-400 font-bold rounded-DEFAULT text-sm hover:bg-emerald-500/10 transition-all text-center">
+            AI Matches
+          </a>
+        </div>
+        {% else %}
+        <a href="{{ url_for('recruiter.recruiter_portal') }}" class="block w-full py-2.5 gradient-cta text-on-primary-fixed font-bold rounded-DEFAULT text-sm hover:scale-[1.02] transition-all text-center">
+          Recruiter Portal
+        </a>
+        {% endif %}
+      </div>
+
+      <!-- Stats -->
+      <div class="glass-panel rounded-DEFAULT border border-white/5 p-5 grid grid-cols-3 gap-4 text-center">
+        <div>
+          <div class="text-2xl font-black text-primary-fixed-dim">{{ user.applications|length }}</div>
+          <div class="text-xs text-slate-500 uppercase tracking-wide font-bold">Applied</div>
+        </div>
+        <div>
+          <div class="text-2xl font-black text-primary-fixed-dim">{{ user.saved_jobs|length }}</div>
+          <div class="text-xs text-slate-500 uppercase tracking-wide font-bold">Saved</div>
+        </div>
+        <div>
+          <div class="text-2xl font-black text-primary-fixed-dim">{{ user.experience_years }}y</div>
+          <div class="text-xs text-slate-500 uppercase tracking-wide font-bold">Exp.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit & Details -->
+    <div class="lg:col-span-2 space-y-5">
+      <!-- Bio -->
+      <div class="glass-panel rounded-DEFAULT border border-white/5 p-6">
+        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-fixed-dim">person</span> About
+        </h2>
+        <p class="text-on-surface-variant leading-relaxed">{{ user.bio }}</p>
+      </div>
+
+      <!-- Skills -->
+      <div class="glass-panel rounded-DEFAULT border border-white/5 p-6">
+        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-fixed-dim">bolt</span> Skills
+        </h2>
+        <div class="flex flex-wrap gap-2">
+          {% for skill in user.skills %}
+          <span class="px-3 py-1.5 rounded-full bg-surface-container-highest border border-white/5 text-sm font-medium hover:border-emerald-400/30 hover:text-emerald-400 transition-colors cursor-default">{{ skill }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Update Form -->
+      <div class="glass-panel rounded-DEFAULT border border-emerald-400/10 p-6">
+        <h2 class="text-lg font-bold mb-5 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-fixed-dim">edit_note</span> Update Profile
+        </h2>
+        <form method="POST" action="{{ url_for('profile.update_profile') }}" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Job Title</label>
+            <input name="title" type="text" value="{{ user.title }}"
+                   class="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:ring-1 focus:ring-emerald-400/30 focus:outline-none placeholder:text-slate-600"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Bio</label>
+            <textarea name="bio" rows="3"
+                      class="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:ring-1 focus:ring-emerald-400/30 focus:outline-none placeholder:text-slate-600 resize-none">{{ user.bio }}</textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Skills <span class="text-slate-500 font-normal">(comma-separated)</span></label>
+            <input name="skills" type="text" value="{{ user.skills | join(', ') }}"
+                   class="w-full bg-surface-container-lowest border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:ring-1 focus:ring-emerald-400/30 focus:outline-none placeholder:text-slate-600"/>
+            <p class="text-xs text-slate-600 mt-1">Updating skills will change your AI recommendations</p>
+          </div>
+          <button type="submit" class="gradient-cta text-on-primary-fixed font-bold px-8 py-3 rounded-DEFAULT hover:scale-[1.02] transition-all active:scale-95">
+            Save Changes
+          </button>
+        </form>
+      </div>
+
+      <!-- ─── Resume Parser Panel ─── -->
+      {% if not user.is_recruiter %}
+      <div class="glass-panel rounded-DEFAULT border border-primary-fixed-dim/20 p-6" id="resumePanel">
+        <h2 class="text-lg font-bold mb-2 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-fixed-dim">description</span>
+          Resume Parser
+          <span class="ml-auto text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-400/20 px-2 py-1 rounded-full font-bold">ML-Powered</span>
+        </h2>
+        <p class="text-sm text-slate-400 mb-5">Upload your PDF resume — our NLP engine will extract and categorise your skills automatically. Then apply them to your profile in one click.</p>
+
+        <!-- Drop Zone -->
+        <div id="dropZone"
+             class="relative border-2 border-dashed border-white/10 rounded-2xl p-8 text-center hover:border-emerald-400/30 transition-all cursor-pointer group"
+             onclick="document.getElementById('resumeFile').click()"
+             ondragover="event.preventDefault(); this.classList.add('border-emerald-400/50')"
+             ondragleave="this.classList.remove('border-emerald-400/50')"
+             ondrop="handleDrop(event)">
+          <span class="material-symbols-outlined text-4xl text-slate-600 group-hover:text-emerald-400 transition-colors block mb-3">upload_file</span>
+          <p class="text-sm font-semibold text-slate-400 group-hover:text-slate-300 transition-colors">Drag & drop your PDF here, or <span class="text-emerald-400">browse</span></p>
+          <p class="text-xs text-slate-600 mt-2">PDF only · Max 5MB</p>
+          <input id="resumeFile" type="file" accept=".pdf" class="hidden" onchange="uploadResume(this.files[0])"/>
+        </div>
+
+        <!-- Loader -->
+        <div id="resumeLoader" class="hidden mt-5 flex items-center gap-3 text-sm text-slate-400">
+          <span class="material-symbols-outlined text-emerald-400 animate-spin">autorenew</span>
+          Parsing resume with NLP engine…
+        </div>
+
+        <!-- Results Panel -->
+        <div id="resumeResults" class="hidden mt-6 space-y-5">
+          <!-- Stats Row -->
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="glass-panel rounded-xl p-3 border border-white/5">
+              <div id="statSkills" class="text-2xl font-black text-primary-fixed-dim">—</div>
+              <div class="text-xs text-slate-500 uppercase tracking-wide font-bold mt-1">Skills Found</div>
+            </div>
+            <div class="glass-panel rounded-xl p-3 border border-white/5">
+              <div id="statWords" class="text-2xl font-black text-primary-fixed-dim">—</div>
+              <div class="text-xs text-slate-500 uppercase tracking-wide font-bold mt-1">Word Count</div>
+            </div>
+            <div class="glass-panel rounded-xl p-3 border border-white/5">
+              <div id="statExp" class="text-2xl font-black text-primary-fixed-dim">—</div>
+              <div class="text-xs text-slate-500 uppercase tracking-wide font-bold mt-1">Exp. Years</div>
+            </div>
+          </div>
+
+          <!-- Category Breakdown -->
+          <div>
+            <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">Skill Breakdown by Category</p>
+            <div id="categoryBreakdown" class="space-y-3"></div>
+          </div>
+
+          <!-- Preview -->
+          <div class="bg-surface-container-lowest rounded-xl p-4 border border-white/5">
+            <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Text Preview</p>
+            <p id="textPreview" class="text-xs text-slate-400 leading-relaxed font-mono whitespace-pre-wrap"></p>
+          </div>
+
+          <!-- Apply Button -->
+          <button id="applySkillsBtn" onclick="applySkills()"
+                  class="w-full gradient-cta text-on-primary-fixed font-bold py-4 rounded-DEFAULT hover:scale-[1.02] transition-all active:scale-95 shadow-lg shadow-emerald-500/20">
+            <span class="material-symbols-outlined align-middle mr-2">bolt</span>
+            Apply Extracted Skills to Profile
+          </button>
+        </div>
+
+        <!-- Error -->
+        <div id="resumeError" class="hidden mt-5 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm"></div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let extractedSkills = [];
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('border-emerald-400/50');
+  const file = e.dataTransfer.files[0];
+  if (file) uploadResume(file);
+}
+
+async function uploadResume(file) {
+  if (!file || !file.name.endsWith('.pdf')) {
+    showError('Please upload a PDF file.');
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    showError('File is too large. Maximum 5MB.');
+    return;
+  }
+
+  document.getElementById('resumeLoader').classList.remove('hidden');
+  document.getElementById('resumeResults').classList.add('hidden');
+  document.getElementById('resumeError').classList.add('hidden');
+
+  const fd = new FormData();
+  fd.append('resume', file);
+
+  try {
+    const resp = await fetch('/profile/parse-resume', { method: 'POST', body: fd });
+    const data = await resp.json();
+    document.getElementById('resumeLoader').classList.add('hidden');
+
+    if (data.error) { showError(data.error); return; }
+
+    extractedSkills = data.skills_found || [];
+    document.getElementById('statSkills').textContent = data.skill_count ?? 0;
+    document.getElementById('statWords').textContent = data.word_count?.toLocaleString() ?? '—';
+    document.getElementById('statExp').textContent = data.experience_years != null ? data.experience_years + 'y' : '?';
+    document.getElementById('textPreview').textContent = data.raw_text_preview || '(No text preview)';
+
+    // Category breakdown
+    const catDiv = document.getElementById('categoryBreakdown');
+    catDiv.innerHTML = '';
+    const cats = data.categories || {};
+    if (Object.keys(cats).length === 0) {
+      catDiv.innerHTML = '<p class="text-xs text-slate-500">No categorised skills found.</p>';
+    } else {
+      for (const [cat, skills] of Object.entries(cats)) {
+        const pct = Math.round((skills.length / (extractedSkills.length || 1)) * 100);
+        catDiv.innerHTML += `
+          <div>
+            <div class="flex justify-between text-xs mb-1.5">
+              <span class="text-on-surface font-semibold">${cat}</span>
+              <span class="text-primary-fixed-dim font-bold">${skills.length} skill${skills.length !== 1 ? 's' : ''}</span>
+            </div>
+            <div class="h-1.5 bg-surface-container-highest rounded-full overflow-hidden mb-2">
+              <div class="h-full rounded-full transition-all" style="width:${pct}%;background:linear-gradient(90deg,#34d399,#10b981)"></div>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              ${skills.map(s => `<span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs border border-emerald-400/20">${s}</span>`).join('')}
+            </div>
+          </div>`;
+      }
+    }
+
+    document.getElementById('resumeResults').classList.remove('hidden');
+  } catch (e) {
+    document.getElementById('resumeLoader').classList.add('hidden');
+    showError('Failed to parse resume. Please try again.');
+  }
+}
+
+async function applySkills() {
+  if (!extractedSkills.length) return;
+  const btn = document.getElementById('applySkillsBtn');
+  btn.disabled = true;
+  btn.textContent = 'Applying…';
+
+  const resp = await fetch('/profile/apply-resume-skills', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ skills: extractedSkills })
+  });
+  const data = await resp.json();
+  if (data.ok) {
+    btn.textContent = `✓ ${data.skill_count} skills applied — reloading…`;
+    btn.classList.remove('gradient-cta');
+    btn.classList.add('bg-emerald-600');
+    setTimeout(() => window.location.reload(), 900);
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Apply Extracted Skills to Profile';
+    showError(data.error || 'Failed to apply skills.');
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('resumeError');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+</script>
+{% endblock %}
