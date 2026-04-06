@@ -63,19 +63,40 @@ class JobRecommender:
 
     def _load_and_build(self):
         """Load jobs from DB first, fallback to jobs.json."""
+        print("Initializing JobRecommender index...")
         try:
             from ..models import Job
             db_jobs = Job.query.all()
             if db_jobs:
                 self.jobs = [j.to_dict() for j in db_jobs]
+                print(f"Loaded {len(self.jobs)} jobs from database.")
             else:
+                print("Database empty, falling back to JSON.")
                 self._load_from_json()
-        except Exception:
+        except Exception as e:
+            print(f"Database access failed during recommender init: {e}. Falling back to JSON.")
             self._load_from_json()
 
+        if not self.jobs:
+            print("Warning: No jobs found in database or JSON. Recommender will be empty.")
+            self.corpus = []
+            self.tfidf_matrix = None
+            return
+
         self.corpus = [build_job_corpus(job) for job in self.jobs]
-        if self.corpus:
-            self.tfidf_matrix = self.vectorizer.fit_transform(self.corpus)
+        
+        # Ensure we have at least one valid document for TF-IDF
+        valid_corpus = [c for c in self.corpus if c.strip()]
+        if valid_corpus:
+            try:
+                self.tfidf_matrix = self.vectorizer.fit_transform(self.corpus)
+                print("TF-IDF matrix built successfully.")
+            except Exception as e:
+                print(f"Error building TF-IDF matrix: {e}")
+                self.tfidf_matrix = None
+        else:
+            print("Warning: All job corpora are empty. TF-IDF matching disabled.")
+            self.tfidf_matrix = None
 
     def _load_from_json(self):
         jobs_path = os.path.join(DATA_DIR, "jobs.json")
