@@ -17,27 +17,34 @@ STOP_WORDS = {
     "our", "your", "their", "my", "his", "her", "which", "who", "whom",
     "what", "when", "where", "why", "how", "all", "both", "each", "few",
     "more", "most", "other", "some", "such", "no", "not", "only", "same",
-    "so", "than", "too", "very", "just", "over", "also", "i", "me", "us"
+    "so", "than", "too", "very", "just", "over", "also", "i", "me", "us",
+    "job", "find", "opportunity", "work", "join", "team", "growth", "global", "experience"
 }
 
 
 def clean_text(text: str) -> str:
     """
-    Lowercase, remove punctuation and stop words from a text string.
-    Returns a clean, space-separated token string.
+    Lowercase, remove punctuation, special characters and stop words from a text string.
+    Specifically handles real-world job data (slashes, pluses, bullets).
     """
     if not isinstance(text, str):
         return ""
     # Lowercase
     text = text.lower()
+    # Normalize slashes/hyphens to spaces (e.g., C++/Java -> c++ java)
+    text = text.replace("/", " ").replace("-", " ")
     # Remove URLs
     text = re.sub(r"http\S+|www\S+", "", text)
-    # Remove punctuation
-    text = text.translate(str.maketrans("", "", string.punctuation))
+    # Remove special punctuation but KEEP '#' and '+' for tech (C#, C++)
+    # We substitute most punctuation with space to avoid merging words
+    pattern = r'[!"$%&\'()*,\.:;<=>?@\[\\\]^_`{|}~]'
+    text = re.sub(pattern, " ", text)
     # Tokenise by whitespace
     tokens = text.split()
-    # Remove stop words and short tokens
-    tokens = [t for t in tokens if t not in STOP_WORDS and len(t) > 1]
+    # Remove stop words
+    tokens = [t for t in tokens if t not in STOP_WORDS]
+    # Filter out numeric tokens and very short nonsensical ones
+    tokens = [t for t in tokens if not t.isdigit() and len(t) > 1]
     return " ".join(tokens)
 
 

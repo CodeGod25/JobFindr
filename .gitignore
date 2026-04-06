@@ -34,3 +34,7 @@ Thumbs.db
 
 # Vercel
 .vercel/
+
+# Large Datasets
+data_ingestion/job_descriptions.csv
+data_ingestion/*.csv
