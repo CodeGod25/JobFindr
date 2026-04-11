@@ -35,6 +35,10 @@ Thumbs.db
 # Vercel
 .vercel/
 
-# Large Datasets
+# Large Datasets (download separately from Kaggle)
+# https://www.kaggle.com/datasets/ravindrasinghrana/job-description-dataset
 data_ingestion/job_descriptions.csv
 data_ingestion/*.csv
+
+# Temp scripts
+generate_colab.py
